@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <title>Carrello Ordini - Appendiabiti Curcio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f3eee6;
+      color: #222;
+    }
+    .app {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+    header {
+      margin-bottom: 16px;
+    }
+    header h1 {
+      font-size: 1.4rem;
+      margin: 0 0 4px 0;
+    }
+    .subtitle {
+      font-size: 0.9rem;
+      color: #555;
+    }
+    .note {
+      font-size: 0.8rem;
+      color: #777;
+      margin-top: 4px;
+    }
+    .products {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .card {
+      background: #fffdf9;
+      border-radius: 14px;
+      padding: 10px 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .thumb {
+      flex-shrink: 0;
+      width: 90px;
+      height: 90px;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #eee1d4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .thumb img {
+      max-width: 100%;
+      max-height: 100%;
+      display: block;
+    }
+    .card-main {
+      flex: 1;
+      min-width: 0;
+    }
+    .code {
+      font-size: 0.8rem;
+      color: #666;
+      margin-bottom: 4px;
+    }
+    .name {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+    }
+    .price {
+      font-weight: 600;
+      color: #c4172c;
+      font-size: 0.9rem;
+      margin-bottom: 2px;
+    }
+    .min {
+      font-size: 0.8rem;
+      color: #777;
+    }
+    .qty-controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      min-width: 100px;
+    }
+    .qty-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 0.85rem;
+      background: #e0d5c8;
+    }
+    button:active {
+      transform: scale(0.97);
+    }
+    .btn-small {
+      padding: 3px 9px;
+      font-size: 0.8rem;
+    }
+    .btn-main {
+      background: #c4172c;
+      color: #fff;
+      font-weight: 600;
+      padding: 8px 14px;
+      font-size: 0.9rem;
+    }
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid #c6b6a3;
+    }
+    .bubble {
+      background: #fff;
+      border-radius: 999px;
+      padding: 3px 8px;
+      font-size: 0.8rem;
+      border: 1px solid #ddd0c0;
+    }
+    .cart-panel {
+      background: #fffdf9;
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      position: sticky;
+      bottom: 0;
+    }
+    .cart-title {
+      font-weight: 600;
+      margin-bottom: 6px;
+      font-size: 1rem;
+    }
+    .cart-empty {
+      font-size: 0.9rem;
+      color: #777;
+    }
+    .cart-lines {
+      font-size: 0.85rem;
+      margin-bottom: 10px;
+      max-height: 170px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .cart-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .cart-item-thumb {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #eee1d4;
+      flex-shrink: 0;
+    }
+    .cart-item-thumb img {
+      max-width: 100%;
+      max-height: 100%;
+      display: block;
+    }
+    .cart-item-text {
+      flex: 1;
+    }
+    textarea {
+      width: 100%;
+      min-height: 70px;
+      font-family: inherit;
+      font-size: 0.8rem;
+      border-radius: 8px;
+      border: 1px solid #d0c4b4;
+      padding: 6px 8px;
+      box-sizing: border-box;
+      resize: vertical;
+      margin-bottom: 8px;
+    }
+    .cart-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .customer-field {
+      margin: 8px 0;
+      font-size: 0.8rem;
+    }
+    .customer-field input {
+      width: 100%;
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: 1px solid #d0c4b4;
+      font-size: 0.8rem;
+      box-sizing: border-box;
+    }
+    @media (max-width: 600px) {
+      .card {
+        flex-direction: row;
+        align-items: flex-start;
+      }
+      .qty-controls {
+        flex-direction: column;
+        align-items: flex-end;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>Ordini appendiabiti Curcio</h1>
+      <div class="subtitle">Seleziona i cartoni per ogni codice, poi invia il riepilogo via WhatsApp.</div>
+      <div class="note">Minimo 1 cartone per articolo. Le foto sono indicative degli articoli selezionati.</div>
+    </header>
+
+    <div class="products" id="products"></div>
+
+    <div class="cart-panel">
+      <div class="cart-title">Riepilogo ordine</div>
+      <div class="customer-field">
+        <label for="customerRef">Nome negozio / riferimento (facoltativo):</label>
+        <input id="customerRef" type="text" placeholder="Es. Supermercato Rossi - Napoli" />
+      </div>
+      <div id="cartLines" class="cart-lines cart-empty">
+        Nessun articolo selezionato.
+      </div>
+      <textarea id="cartText" readonly placeholder="Qui apparirà il riepilogo codici - cartoni."></textarea>
+      <div class="cart-actions">
+        <button class="btn-main" onclick="sendWhatsApp()">Invia via WhatsApp</button>
+        <button class="btn-ghost btn-small" onclick="copyCart()">Copia riepilogo</button>
+        <button class="btn-ghost btn-small" onclick="clearCart()">Svuota tutto</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const PRODUCTS = [
+  {
+    "code": "48373",
+    "name": "Set 6 grucce appendiabiti in plastica vellutata-ass. 4 colori-cm. 40 x 22",
+    "price": "1,28 €/St",
+    "min_per_carton": 24,
+    "img": "star_48373.png"
+  },
+  {
+    "code": "42065",
+    "name": "Set 2 grucce appendiabiti in plastica vellutata uomo-ass. 4 colori-cm. 45 x 23",
+    "price": "0,46 €/St",
+    "min_per_carton": 48,
+    "img": "star_42065.png"
+  },
+  {
+    "code": "119096",
+    "name": "Set 8 grucce appendiabiti in plastica vellutata-ass. 3 colori-cm. 40 x 22",
+    "price": "1,29 €/St",
+    "min_per_carton": 18,
+    "img": "star_119096.png"
+  },
+  {
+    "code": "119095",
+    "name": "Set 5 grucce appendiabiti in plastica vellutata-ass. 3 colori-cm. 40 x 22",
+    "price": "0,82 €/St",
+    "min_per_carton": 36,
+    "img": "star_119095.png"
+  },
+  {
+    "code": "119094",
+    "name": "Set 3 grucce appendiabiti in plastica vellutata-ass. 3 colori-cm. 40 x 22",
+    "price": "0,51 €/St",
+    "min_per_carton": 48,
+    "img": "star_119094.png"
+  },
+  {
+    "code": "119093",
+    "name": "Set 8 grucce appendiabiti in plastica vellutata-ass. 3 colori-cm. 40 x 22",
+    "price": "1,29 €/St",
+    "min_per_carton": 18,
+    "img": "star_119093.png"
+  },
+  {
+    "code": "119092",
+    "name": "Set 5 grucce appendiabiti in plastica vellutata-ass. 3 colori-cm. 40 x 22",
+    "price": "0,82 €/St",
+    "min_per_carton": 36,
+    "img": "star_119092.png"
+  },
+  {
+    "code": "119091",
+    "name": "Set 3 grucce appendiabiti in plastica vellutata-ass. 3 colori-cm. 40 x 22",
+    "price": "0,51 €/St",
+    "min_per_carton": 48,
+    "img": "star_119091.png"
+  },
+  {
+    "code": "119090",
+    "name": "Set 3 grucce appendiabiti in plastica vellutata-ass. 4 colori-cm. 44,5 x 23",
+    "price": "0,57 €/St",
+    "min_per_carton": 48,
+    "img": "star_119090.png"
+  },
+  {
+    "code": "116042",
+    "name": "Set 25 grucce appendiabiti in plastica vellutata-ass. 4 combinazioni di 5 colori-cm. 44 x 23",
+    "price": "4,61 €/St",
+    "min_per_carton": 8,
+    "img": "star_116042.png"
+  },
+  {
+    "code": "116040",
+    "name": "Set 8 grucce appendiabiti in plastica vellutata-ass. 4 colori-cm. 44 x 23",
+    "price": "1,49 €/St",
+    "min_per_carton": 16,
+    "img": "star_116040.png"
+  },
+  {
+    "code": "116039",
+    "name": "Set 6 grucce appendiabiti in plastica vellutata-ass. 4 colori-cm. 41 x 21",
+    "price": "1,18 €/St",
+    "min_per_carton": 20,
+    "img": "star_116039.png"
+  },
+  {
+    "code": "105682",
+    "name": "Set 12 grucce appendiabiti in plastica vellutata-ass. 3 colori- cm. 44,5 x 24",
+    "price": "2,51 €/St",
+    "min_per_carton": 12,
+    "img": "star_105682.png"
+  },
+  {
+    "code": "105678",
+    "name": "Set 6 grucce appendiabiti in plastica vellutata-ass. 3 colori-cm. 45 x 23,5",
+    "price": "1,26 €/St",
+    "min_per_carton": 24,
+    "img": "star_105678.png"
+  }
+];
+
+    const cart = {}; // code -> qty cartoni
+
+    function renderProducts() {
+      const container = document.getElementById('products');
+      container.innerHTML = '';
+      PRODUCTS.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        const thumb = document.createElement('div');
+        thumb.className = 'thumb';
+        const img = document.createElement('img');
+        img.src = p.img;
+        img.alt = p.code;
+        thumb.appendChild(img);
+
+        const main = document.createElement('div');
+        main.className = 'card-main';
+
+        const code = document.createElement('div');
+        code.className = 'code';
+        code.textContent = 'Codice: ' + p.code;
+
+        const name = document.createElement('div');
+        name.className = 'name';
+        name.textContent = p.name;
+
+        const price = document.createElement('div');
+        price.className = 'price';
+        price.textContent = p.price;
+
+        const min = document.createElement('div');
+        min.className = 'min';
+        min.textContent = 'Cartonaggio: ' + (p.min_per_carton || '?') + ' pezzi (1 cartone)';
+
+        main.appendChild(code);
+        main.appendChild(name);
+        main.appendChild(price);
+        main.appendChild(min);
+
+        const controls = document.createElement('div');
+        controls.className = 'qty-controls';
+
+        const qtyRow = document.createElement('div');
+        qtyRow.className = 'qty-row';
+
+        const minusBtn = document.createElement('button');
+        minusBtn.className = 'btn-small';
+        minusBtn.textContent = '-';
+        minusBtn.onclick = () => changeQty(p.code, -1);
+
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        bubble.id = 'bubble-' + p.code;
+        bubble.textContent = '0 cart.';
+
+        const plusBtn = document.createElement('button');
+        plusBtn.className = 'btn-small';
+        plusBtn.textContent = '+';
+        plusBtn.onclick = () => changeQty(p.code, 1);
+
+        qtyRow.appendChild(minusBtn);
+        qtyRow.appendChild(bubble);
+        qtyRow.appendChild(plusBtn);
+
+        const addBtn = document.createElement('button');
+        addBtn.textContent = '➕ Ordina';
+        addBtn.onclick = () => setAtLeastOne(p.code);
+
+        controls.appendChild(qtyRow);
+        controls.appendChild(addBtn);
+
+        card.appendChild(thumb);
+        card.appendChild(main);
+        card.appendChild(controls);
+
+        container.appendChild(card);
+      });
+    }
+
+    function changeQty(code, delta) {
+      const current = cart[code] || 0;
+      let next = current + delta;
+      if (next < 0) next = 0;
+      if (next === 0) {
+        delete cart[code];
+      } else {
+        cart[code] = next;
+      }
+      updateUI();
+    }
+
+    function setAtLeastOne(code) {
+      if (!cart[code] || cart[code] < 1) {
+        cart[code] = 1;
+      }
+      updateUI();
+    }
+
+    function updateUI() {
+      PRODUCTS.forEach(p => {
+        const bubble = document.getElementById('bubble-' + p.code);
+        const q = cart[p.code] || 0;
+        if (bubble) bubble.textContent = q + ' cart.';
+      });
+
+      const linesDiv = document.getElementById('cartLines');
+      const ta = document.getElementById('cartText');
+
+      const codes = Object.keys(cart);
+      if (codes.length === 0) {
+        linesDiv.classList.add('cart-empty');
+        linesDiv.innerHTML = 'Nessun articolo selezionato.';
+        ta.value = '';
+        return;
+      }
+
+      linesDiv.classList.remove('cart-empty');
+      linesDiv.innerHTML = '';
+
+      const lines = [];
+      codes.forEach(code => {
+        const q = cart[code];
+        const prod = PRODUCTS.find(p => p.code === code);
+        const line = code + ' - ' + q + ' cart.';
+        lines.push(line);
+
+        const row = document.createElement('div');
+        row.className = 'cart-item';
+
+        const t = document.createElement('div');
+        t.className = 'cart-item-thumb';
+        const img = document.createElement('img');
+        img.src = prod.img;
+        img.alt = code;
+        t.appendChild(img);
+
+        const txt = document.createElement('div');
+        txt.className = 'cart-item-text';
+        txt.textContent = line;
+
+        row.appendChild(t);
+        row.appendChild(txt);
+        linesDiv.appendChild(row);
+      });
+
+      ta.value = lines.join('\n');
+    }
+
+    function copyCart() {
+      const ta = document.getElementById('cartText');
+      if (!ta.value.trim()) return;
+      ta.select();
+      document.execCommand('copy');
+      alert('Riepilogo copiato negli appunti.');
+    }
+
+    function clearCart() {
+      for (const k in cart) delete cart[k];
+      updateUI();
+    }
+
+    function sendWhatsApp() {
+      const ta = document.getElementById('cartText');
+      const txt = ta.value.trim();
+      if (!txt) {
+        alert('Seleziona almeno un articolo.');
+        return;
+      }
+      const ref = document.getElementById('customerRef').value.trim();
+      let message = 'Ordine appendiabiti:\n' + txt;
+      if (ref) {
+        message += '\n\nCliente: ' + ref;
+      }
+      const phone = '393386838802';
+      const url = 'https://wa.me/' + phone + '?text=' + encodeURIComponent(message);
+      window.open(url, '_blank');
+    }
+
+    renderProducts();
+  </script>
+</body>
+</html>
